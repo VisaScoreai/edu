@@ -1,51 +1,77 @@
 /**
  * Application component
  *
- * To contain application wide settings, routes, state, etc.
+ * SMM Panel - Social Media Marketing Dashboard Application
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-import About from "./Components/About";
-import Footer from "./Components/Footer";
-import Header from "./Components/Header";
-import Home from "./Components/Home";
-import Portfolio from "./Components/Portfolio";
+import Login from "./Components/Login";
+import Navigation from "./Components/Navigation";
+import Dashboard from "./Components/Dashboard";
+import Services from "./Components/Services";
+import Orders from "./Components/Orders";
+import Wallet from "./Components/Wallet";
 
 import "./styles.css";
 
-/**
- * This object represents your information. The project is set so that you
- * only need to update these here, and values are passed a properties to the
- * components that need that information.
- *
- * Update the values below with your information.
- *
- * If you don't have one of the social sites listed, leave it as an empty string.
- */
-const siteProps = {
-  name: "Alexandrie Grenier",
-  title: "Web Designer & Content Creator",
-  email: "alex@example.com",
-  gitHub: "microsoft",
-  instagram: "microsoft",
-  linkedIn: "satyanadella",
-  medium: "",
-  twitter: "microsoft",
-  youTube: "Code",
-};
-
-const primaryColor = "#4E567E";
-const secondaryColor = "#D2F1E4";
-
 const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState("");
+  const [activeSection, setActiveSection] = useState("dashboard");
+
+  // Check for existing authentication on app load
+  useEffect(() => {
+    const savedUser = localStorage.getItem("smmPanelUser");
+    if (savedUser) {
+      setUser(savedUser);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (email) => {
+    setUser(email);
+    setIsAuthenticated(true);
+    localStorage.setItem("smmPanelUser", email);
+  };
+
+  const handleLogout = () => {
+    setUser("");
+    setIsAuthenticated(false);
+    setActiveSection("dashboard");
+    localStorage.removeItem("smmPanelUser");
+  };
+
+  const renderActiveSection = () => {
+    switch (activeSection) {
+      case "dashboard":
+        return <Dashboard user={user} />;
+      case "services":
+        return <Services />;
+      case "orders":
+        return <Orders />;
+      case "wallet":
+        return <Wallet />;
+      default:
+        return <Dashboard user={user} />;
+    }
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
-    <div id="main">
-      <Header />
-      <Home name={siteProps.name} title={siteProps.title} />
-      <About />
-      <Portfolio />
-      <Footer {...siteProps} primaryColor={primaryColor} secondaryColor={secondaryColor} />
+    <div id="main" className="smm-app">
+      <Navigation 
+        user={user} 
+        onLogout={handleLogout}
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
+      <main className="main-content">
+        {renderActiveSection()}
+      </main>
     </div>
   );
 };
