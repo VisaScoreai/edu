@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  smm-panel:
+    build: .
+    ports:
+      - "1234:1234"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
+
+  # Future: Add backend services here
+  # database:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_DB: smm_panel
+  #     POSTGRES_USER: smm_user
+  #     POSTGRES_PASSWORD: your_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# volumes:
+#   postgres_data:
